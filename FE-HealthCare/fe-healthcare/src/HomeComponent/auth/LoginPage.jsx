@@ -10,7 +10,6 @@ import {Alert, Button, Card, Col, Container, Form, Image, InputGroup, Row} from 
 import {ErrorMessage, Field, Form as FormikForm, Formik} from "formik";
 import {LockFill, PersonFill} from "react-bootstrap-icons";
 
-
 let count = 3;
 const validationSchema = Yup.object().shape({
     username: Yup.string()
@@ -109,7 +108,7 @@ function LoginPage() {
                     <Col md={8} lg={6} xl={5}>
                         {/* Logo + Welcome */}
                         <div className="text-center mb-4 text-white">
-                            <Image src={logo} alt="logo" width={100} className="mb-3 " rounded={true} />
+                            <Image src={logo} alt="logo" width={100} className="mb-3 " rounded={true}/>
                             <h2 className="fw-bold">
                                 Welcome to <span className="text-decoration-line-through">Health Care</span>
                             </h2>

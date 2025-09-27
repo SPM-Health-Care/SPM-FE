@@ -16,7 +16,7 @@ const Sidebar = () => {
             </div>
             <Nav className="flex-column gap-2">
                 <Nav.Link
-                    href="health"
+                    href="/health"
                     className={`d-flex align-items-center rounded px-3 py-2 ${
                         active === "Health" ? "bg-primary text-white" : "text-dark"
                     }`}
@@ -27,14 +27,14 @@ const Sidebar = () => {
                 </Nav.Link>
 
                 <Nav.Link
-                    href="#"
+                    href="/reminder"
                     className={`d-flex align-items-center rounded px-3 py-2 ${
                         active === "reminder" ? "bg-primary text-white" : "text-dark"
                     }`}
                     onClick={() => setActive("reminder")}
                 >
                     <Alarm className="me-2"/>
-                    Nhắc nhở & lịch trình
+                    Nhắc nhở
                 </Nav.Link>
 
                 <Nav.Link
@@ -49,25 +49,25 @@ const Sidebar = () => {
                 </Nav.Link>
 
                 <Nav.Link
-                    href="#"
+                    href="/sleep"
                     className={`d-flex align-items-center rounded px-3 py-2 ${
                         active === "sleep" ? "bg-primary text-white" : "text-dark"
                     }`}
                     onClick={() => setActive("sleep")}
                 >
                     <Moon className="me-2"/>
-                    Giấc ngủ & thư giãn
+                    Giấc ngủ
                 </Nav.Link>
 
                 <Nav.Link
-                    href="#"
+                    href="/mood"
                     className={`d-flex align-items-center rounded px-3 py-2 ${
                         active === "habit" ? "bg-primary text-white" : "text-dark"
                     }`}
                     onClick={() => setActive("habit")}
                 >
                     <ClipboardCheck className="me-2"/>
-                    Thói quen & tinh thần
+                    Tinh thần
                 </Nav.Link>
 
                 <Nav.Link
