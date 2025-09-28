@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Badge, Button, Card, Col, Form, Modal, ProgressBar, Row, Spinner} from "react-bootstrap";
+import {Badge, Button, Card, Col, Container, Form, Modal, ProgressBar, Row, Spinner} from "react-bootstrap";
 import {FaAppleAlt, FaBell, FaBrain, FaCheckCircle, FaClock, FaDumbbell, FaHandsHelping, FaPills} from "react-icons/fa";
 import classNames from "classnames";
 import * as ReminderService from "../service/ReminderService";
@@ -98,7 +98,7 @@ const ReminderComponent = () => {
     };
 
     return (
-        <div className="p-3">
+        <Container fluid className="mt-4">
             <h4 className="mb-4 text-center">Nhắc nhở của bạn</h4>
 
             <ProgressBar
@@ -222,7 +222,7 @@ const ReminderComponent = () => {
                     </Card>
                 </Col>
             </Row>
-        </div>
+        </Container>
     );
 };
 
