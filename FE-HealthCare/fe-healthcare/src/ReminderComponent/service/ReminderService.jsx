@@ -23,3 +23,27 @@ export const getAllReminderTypes = async () => {
         console.error("Error fetching reminder types:", error);
     }
 }
+
+export const createReminder = async (reminderData) => {
+    try {
+        const token = localStorage.getItem("token");
+        let response = await axios.post(`http://localhost:1010/api/reminders-create`, reminderData, {
+            headers: {Authorization: `Bearer ${token}`},
+        });
+        return response.data;
+    }catch (error) {
+        console.error("Error creating reminder:", error);
+    }
+}
+
+export const updateStatusReminder = async (userId, reminderId, reminderData) => {
+    try {
+        const token = localStorage.getItem("token");
+        let response = await axios.put(`http://localhost:1010/api/reminders/${userId}/${reminderId}`, reminderData, {
+            headers: {Authorization: `Bearer ${token}`},
+        });
+        return response.data;
+    }catch (error) {
+        console.error("Error updating reminder status:", error);
+    }
+}

@@ -47,3 +47,21 @@ export const updateHealthMetric = async (userId,recordedAt, metricData) => {
         console.error("Error updating health metric:", error);
     }
 }
+
+export const createHealthMetric = async (metricData) => {
+    try {
+        const token = localStorage.getItem("token");
+        let response = await axios.post("http://localhost:1010/api/metrics-create",
+            metricData,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error creating health metric:", error);
+        throw error;
+    }
+};
+
+
