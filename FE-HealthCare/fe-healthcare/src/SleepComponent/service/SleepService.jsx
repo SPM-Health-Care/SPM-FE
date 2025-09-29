@@ -38,3 +38,15 @@ export const createSleep = async (sleepData) => {
         console.error("Error creating sleep data:", error);
     }
 }
+
+export const deleteSleep = async (sleepId) => {
+    try {
+        const token = localStorage.getItem("token");
+        let response = await axios.delete(`http://localhost:1010/api/sleeptrackings/${sleepId}`, {
+            headers: {Authorization: `Bearer ${token}`},
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting sleep data:", error);
+    }
+}

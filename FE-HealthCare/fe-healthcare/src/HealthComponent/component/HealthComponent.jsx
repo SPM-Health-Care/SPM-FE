@@ -13,7 +13,7 @@ import {
     XAxis,
     YAxis,
 } from "recharts";
-import {FaBullseye, FaEdit, FaHeartbeat, FaPlus} from "react-icons/fa";
+import {FaBullseye, FaEdit, FaHeartbeat, FaPlus, FaTrash} from "react-icons/fa";
 
 const HealthComponent = () => {
         const userId = localStorage.getItem("id");
@@ -41,6 +41,10 @@ const HealthComponent = () => {
         const [selectedMetric, setSelectedMetric] = useState(null);
         const [editValue, setEditValue] = useState("");
         const [metricField, setMetricField] = useState(null);
+
+        //xóa metric
+        const [showDeleteModal, setShowDeleteModal] = useState(false);
+        const [deleteMetricId, setDeleteMetricId] = useState(null);
 
         useEffect(() => {
             if (userId) {
@@ -211,6 +215,22 @@ const HealthComponent = () => {
                 });
             } catch (err) {
                 console.error("Error creating new metric:", err);
+            }
+        };
+        const handleOpenDeleteModal = (metricId) => {
+            setDeleteMetricId(metricId);
+            setShowDeleteModal(true);
+        };
+        const handleDeleteMetric = async () => {
+            if (!deleteMetricId) return;
+
+            try {
+                await HealthService.deleteHealthMetric(deleteMetricId);
+                setHealthMetrics((prev) => prev.filter((m) => m.metricId !== deleteMetricId));
+                setShowDeleteModal(false);
+                setDeleteMetricId(null);
+            } catch (err) {
+                console.error("Error deleting metric:", err);
             }
         };
 
@@ -454,7 +474,7 @@ const HealthComponent = () => {
                             <Card.Header className="fw-bold bg-light">
                                 ❤️ Huyết áp theo thời gian
                             </Card.Header>
-                            <Card.Body style={{ height: "300px" }}>
+                            <Card.Body style={{height: "300px"}}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart
                                         data={healthMetrics
@@ -463,14 +483,14 @@ const HealthComponent = () => {
                                     >
                                         <defs>
                                             <linearGradient id="bpColor" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#dc3545" stopOpacity={0.8} />
-                                                <stop offset="95%" stopColor="#dc3545" stopOpacity={0} />
+                                                <stop offset="5%" stopColor="#dc3545" stopOpacity={0.8}/>
+                                                <stop offset="95%" stopColor="#dc3545" stopOpacity={0}/>
                                             </linearGradient>
                                         </defs>
-                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <CartesianGrid strokeDasharray="3 3"/>
                                         {/* Ẩn tick X để không chiếm chỗ */}
-                                        <XAxis dataKey="recordedAt" tick={false} axisLine={false} />
-                                        <YAxis domain={[60, 140]} />
+                                        <XAxis dataKey="recordedAt" tick={false} axisLine={false}/>
+                                        <YAxis domain={[60, 140]}/>
                                         <Tooltip
                                             formatter={(value) => [`${value} mmHg`, "Huyết áp"]}
                                             labelFormatter={(label) =>
@@ -486,8 +506,8 @@ const HealthComponent = () => {
                                             dataKey="bloodPressure"
                                             stroke="#dc3545"
                                             fill="url(#bpColor)"
-                                            dot={{ r: 3 }}
-                                            activeDot={{ r: 6 }}
+                                            dot={{r: 3}}
+                                            activeDot={{r: 6}}
                                         />
                                     </AreaChart>
                                 </ResponsiveContainer>
@@ -562,14 +582,22 @@ const HealthComponent = () => {
                                                         <small>Min: {m.minValue} | Max: {m.maxValue}</small>
                                                     )}
                                                 </div>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline-primary"
-                                                    onClick={() => handleOpenMetricModal(m, "heartRate")}
-                                                >
-                                                    <FaEdit/>
-                                                </Button>
-
+                                                <td className="d-flex gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline-primary"
+                                                        onClick={() => handleOpenMetricModal(m, "heartRate")}
+                                                    >
+                                                        <FaEdit/>
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline-danger"
+                                                        onClick={() => handleOpenDeleteModal(m.metricId)}
+                                                    >
+                                                        <FaTrash />
+                                                    </Button>
+                                                </td>
                                             </ListGroup.Item>
                                         )
                                     ))}
@@ -599,13 +627,23 @@ const HealthComponent = () => {
                                                         <small>Min: {m.minValue} | Max: {m.maxValue}</small>
                                                     )}
                                                 </div>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline-danger"
-                                                    onClick={() => handleOpenMetricModal(m, "bloodPressure")}
-                                                >
-                                                    <FaEdit/>
-                                                </Button>
+                                                <td className="d-flex gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline-primary"
+                                                        onClick={() => handleOpenMetricModal(m, "bloodPressure")}
+                                                    >
+                                                        <FaEdit/>
+                                                    </Button>
+
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline-danger"
+                                                        onClick={() => handleOpenDeleteModal(m.metricId)}
+                                                    >
+                                                        <FaTrash />
+                                                    </Button>
+                                                </td>
                                             </ListGroup.Item>
                                         )
                                     ))}
@@ -614,6 +652,22 @@ const HealthComponent = () => {
                         </Card>
                     </Col>
                 </Row>
+                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+                <Modal.Header closeButton>
+                        <Modal.Title>Xác nhận xóa</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        Bạn có chắc chắn muốn xóa số liệu này không?
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                            Hủy
+                        </Button>
+                        <Button variant="danger" onClick={handleDeleteMetric}>
+                            Xóa
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </Container>
         );
     }

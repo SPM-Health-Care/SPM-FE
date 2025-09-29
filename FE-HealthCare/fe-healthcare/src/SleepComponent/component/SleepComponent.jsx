@@ -13,7 +13,7 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
-import {FaEdit, FaPlus} from "react-icons/fa";
+import {FaEdit, FaPlus, FaTrash} from "react-icons/fa";
 
 const userId = localStorage.getItem('id');
 const SleepComponent = () => {
@@ -31,6 +31,10 @@ const SleepComponent = () => {
     const [newDate, setNewDate] = useState("");
     const [newSleepTime, setNewSleepTime] = useState("");
     const [newWakeTime, setNewWakeTime] = useState("");
+
+    // modal delete
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
 
     useEffect(() => {
 
@@ -115,6 +119,7 @@ const SleepComponent = () => {
             }
 
             return {
+                sleepId: tracking.sleepId,
                 date: new Date(tracking.recordedAt).toLocaleDateString("vi-VN"),
                 sleepDuration: (wakeDateTime - sleepDateTime) / (1000 * 60 * 60),
                 sleepTimeDate: sleepDateTime,
@@ -158,6 +163,25 @@ const SleepComponent = () => {
         }
     };
 
+    // mở modal
+    const handleDeleteClick = (sleepId) => {
+        setDeleteId(sleepId);
+        setShowDeleteModal(true);
+    };
+
+    // gọi API xóa
+    const handleConfirmDelete = async () => {
+        if (!deleteId) return;
+        try {
+            await SleepService.deleteSleep(deleteId);
+            await fetchSleepData(userId);
+            setShowDeleteModal(false);
+            setDeleteId(null);
+        } catch (err) {
+            console.error("Error deleting sleep:", err);
+        }
+    };
+
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{minHeight: "50vh"}}>
@@ -167,10 +191,7 @@ const SleepComponent = () => {
         );
     }
     return (
-        <Container className="my-4">
-            {/*<Button variant="success" className="mb-3" onClick={() => setShowCreateModal(true)}>*/}
-            {/*    + Thêm giấc ngủ*/}
-            {/*</Button>*/}
+        <Container fluid className="mt-4">
             <Stack direction="horizontal" className="mb-3 justify-content-end">
                 <Button variant="success" onClick={() => setShowCreateModal(true)}>
                     <FaPlus className="me-1"/> Thêm mới
@@ -326,7 +347,7 @@ const SleepComponent = () => {
                                                         ? "Trung bình"
                                                         : "Cần cải thiện"}
                                             </td>
-                                            <td className="text-center">
+                                            <td className="d-flex justify-content-center gap-2">
                                                 <Button
                                                     variant="outline-primary"
                                                     size="sm"
@@ -334,6 +355,14 @@ const SleepComponent = () => {
                                                     onClick={() => handleOpenModal(item)}
                                                 >
                                                     <FaEdit/>
+                                                </Button>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    title="Xóa"
+                                                    onClick={() => handleDeleteClick(item.sleepId)}
+                                                >
+                                                    <FaTrash/>
                                                 </Button>
                                             </td>
                                         </tr>
@@ -430,6 +459,23 @@ const SleepComponent = () => {
                     </Button>
                     <Button variant="primary" onClick={handleCreate}>
                         Tạo mới
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Xác nhận xóa</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Bạn có chắc chắn muốn xóa không?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                        Hủy
+                    </Button>
+                    <Button variant="danger" onClick={handleConfirmDelete}>
+                        Xóa
                     </Button>
                 </Modal.Footer>
             </Modal>

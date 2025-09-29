@@ -35,3 +35,15 @@ export const createMoodTracking = async (moodTrackingData) => {
         console.error("Error creating mood tracking:", error);
     }
 }
+
+export const deleteMoodTracking = async (moodTrackingId) => {
+    try {
+        const token = localStorage.getItem("token");
+        let response = await axios.delete(`http://localhost:1010/api/moodtrackings/${moodTrackingId}`, {
+            headers: {Authorization: `Bearer ${token}`},
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting mood tracking:", error);
+    }
+}

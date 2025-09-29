@@ -1,6 +1,16 @@
 import {useEffect, useState} from "react";
 import {Badge, Button, Card, Col, Container, Form, Modal, ProgressBar, Row, Spinner} from "react-bootstrap";
-import {FaAppleAlt, FaBell, FaBrain, FaCheckCircle, FaClock, FaDumbbell, FaHandsHelping, FaPills} from "react-icons/fa";
+import {
+    FaAppleAlt,
+    FaBell,
+    FaBrain,
+    FaCheckCircle,
+    FaClock,
+    FaDumbbell,
+    FaHandsHelping,
+    FaMinusCircle,
+    FaPills
+} from "react-icons/fa";
 import classNames from "classnames";
 import * as ReminderService from "../service/ReminderService";
 
@@ -11,6 +21,9 @@ const ReminderComponent = () => {
     const [showModal, setShowModal] = useState(false);
     const [reminderTypes, setReminderTypes] = useState([]);
     const [newReminder, setNewReminder] = useState({status: "Pending", typeId: ""});
+    // modal xoá
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedReminderId, setSelectedReminderId] = useState(null);
 
     const completedCount = reminders.filter(r => r.status === "Completed").length;
     const pendingCount = reminders.filter(r => r.status === "Pending").length;
@@ -96,11 +109,26 @@ const ReminderComponent = () => {
         };
         return icons[typeName] || <FaBell size={30} className="text-secondary"/>;
     };
+    const handleOpenDeleteModal = (reminderId) => {
+        setSelectedReminderId(reminderId);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteReminder = async () => {
+        try {
+            if (selectedReminderId) {
+                await ReminderService.deleteReminder(selectedReminderId);
+                await fetchData(userId);
+            }
+        } catch (error) {
+            console.error("Error deleting reminder:", error);
+        } finally {
+            setShowDeleteModal(false);
+        }
+    };
 
     return (
         <Container fluid className="mt-4">
-            <h4 className="mb-4 text-center">Nhắc nhở của bạn</h4>
-
             <ProgressBar
                 now={progress}
                 label={`${Math.round(progress)}% hoàn thành`}
@@ -127,6 +155,17 @@ const ReminderComponent = () => {
                     </Card>
                 </Col>
             </Row>
+            {/* Modal xác nhận xoá */}
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Xác nhận xoá</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Bạn có chắc chắn muốn xoá reminder này?</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Hủy</Button>
+                    <Button variant="danger" onClick={handleDeleteReminder}>Xoá</Button>
+                </Modal.Footer>
+            </Modal>
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
@@ -138,7 +177,7 @@ const ReminderComponent = () => {
                             <Form.Label>Loại nhắc nhở</Form.Label>
                             <Form.Select
                                 value={newReminder.typeId}
-                                onChange={(e) => setNewReminder({ ...newReminder, typeId: e.target.value })}
+                                onChange={(e) => setNewReminder({...newReminder, typeId: e.target.value})}
                             >
                                 <option value="">-- Chọn loại --</option>
                                 {reminderTypes.map((type) => (
@@ -153,7 +192,7 @@ const ReminderComponent = () => {
                             <Form.Label>Trạng thái</Form.Label>
                             <Form.Select
                                 value={newReminder.status}
-                                onChange={(e) => setNewReminder({ ...newReminder, status: e.target.value })}
+                                onChange={(e) => setNewReminder({...newReminder, status: e.target.value})}
                             >
                                 <option value="Pending">Pending</option>
                                 <option value="Completed">Completed</option>
@@ -178,6 +217,13 @@ const ReminderComponent = () => {
                                     "border-warning": !isCompleted,
                                 })}
                             >
+                                {/* nút xoá ở góc phải trên */}
+                                <div className="position-absolute top-0 end-0 m-2">
+                                    <Button variant="link" className="text-danger p-0"
+                                            onClick={() => handleOpenDeleteModal(reminder.reminderId)}>
+                                        <FaMinusCircle size={22} />
+                                    </Button>
+                                </div>
                                 <div className="mb-3">{getTypeIcon(reminder.typeName)}</div>
                                 <h6>{reminder.typeName}</h6>
                                 <Badge bg={isCompleted ? "success" : "warning"} className="mb-2">

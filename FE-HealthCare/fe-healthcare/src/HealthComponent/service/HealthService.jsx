@@ -64,4 +64,16 @@ export const createHealthMetric = async (metricData) => {
     }
 };
 
+export const deleteHealthMetric = async (metricId) => {
+    try {
+        const token = localStorage.getItem("token");
+        let response = await axios.delete(`http://localhost:1010/api/metrics/${metricId}`, {
+            headers: {Authorization: `Bearer ${token}`},
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting health metric:", error);
+    }
+};
+
 

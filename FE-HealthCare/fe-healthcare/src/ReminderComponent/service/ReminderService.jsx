@@ -47,3 +47,14 @@ export const updateStatusReminder = async (userId, reminderId, reminderData) => 
         console.error("Error updating reminder status:", error);
     }
 }
+export const deleteReminder = async (reminderId) => {
+    try {
+        const token = localStorage.getItem("token");
+        let response = await axios.delete(`http://localhost:1010/api/reminders/${reminderId}`, {
+            headers: {Authorization: `Bearer ${token}`},
+        });
+        return response.data;
+    }catch (error) {
+        console.error("Error deleting reminder:", error);
+    }
+}
